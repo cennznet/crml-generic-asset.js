@@ -23,5 +23,8 @@ module.exports = {
         },
     },
     testEnvironment: '../../jest/env.js',
+    moduleNameMapper: {
+        '@cennznet/crml-generic-asset(.*)$': '<rootDir>/src/$1'
+    },
     setupFilesAfterEnv: ['../../jest/jest.setup.js']
 };

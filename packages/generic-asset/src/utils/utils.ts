@@ -14,7 +14,6 @@
 
 import {Codec} from '@cennznet/types/polkadot.types';
 import {blake2AsHex, isBn, isNumber, isObject, isU8a, stringToU8a, xxhashAsHex} from '@cennznet/util';
-import {Compact} from '@plugnet/types';
 
 export function isAssetObj(value: any): boolean {
     return isObject(value) && !isU8a(value) && !isBn(value) && isNumber(value.id);

@@ -1,4 +1,4 @@
-# `cennznet-js/generic-asset`
+# `cennznet-js/crml-generic-asset`
 
 > The Cennznet JavaScript API library for supporting generic asset.
 
@@ -7,46 +7,42 @@
 # Install
 
 ```
-$> npm config set registry https://npm-proxy.fury.io/centrality/
-$> npm login
-$> npm i cennznet-generic-asset cennznet-api @polkadot/api @polkadot/extrinsics @polkadot/rpc-core @polkadot/rpc-provider @polkadot/storage @polkadot/types
-$> npm i cennznet-wallet
+$> npm i @cennznet/api @cennznet/crml-generic-asset @cennznet/crml-cennzx-spot @cennznet/crml-attestation
+$> npm i @cennznet/wallet
 ```
 
 
 
-# USAGE (Promise)
+# USAGE
 
 node --experimental-repl-await
 ```
 // initialize Api and connect to dev network
-const {Api} = require('cennznet-api')
-const api = await Api.create({provider: 'wss://cennznet-node-0.centrality.me:9944'});
+const {Api} = require('@cennznet/api')
+const api = await Api.create({provider: 'wss://rimu.unfrastructure.io/ws?apikey=***'});
+// please apply api key from https://www.unfrastructure.io or use local network.
 
-// initialize generic asset
-const {GenericAsset} = require('cennznet-generic-asset')
-const ga = await GenericAsset.create(api);
+const ga = api.genericAsset;
 
 // initialize wallet and import an account
-const {SimpleKeyring, Wallet} = require('cennznet-wallet')
-const {stringToU8a} = require('@polkadot/util')
+const {SimpleKeyring, Wallet} = require('@cennznet/wallet')
 const assetOwner = {
-    address: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT',
-    seed: stringToU8a('cennznetjstest'.padEnd(32, ' '))
-}
+    address: '5DXUeE5N5LtkW97F2PzqYPyqNkxqSWESdGSPTX6AvkUAhwKP',
+    uri: '//cennznet-js-test',
+};
 const receiver = {
-    address: '5EfqejHV2xUUTdmUVBH7PrQL3edtMm1NQVtvCgoYd8RumaP3',
-    seed: stringToU8a('cennznetjstest2'.padEnd(32, ' '))
-}
+    address: '5ESNjjzmZnnCdrrpUo9TBKhDV1sakTjkspw2ZGg84LAK1e1Y'
+};
 
 const testAsset = {
-    id: 1000036,
+    id: 16000,
+    symbol: 'CENNZ-T',
     ownerAccount: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT',
-    initialIssuance: 10000000000
-}
+    totalSupply: '20000000000000000000000000000'
+};
 
 const simpleKeyring = new SimpleKeyring();
-simpleKeyring.addFromSeed(assetOwner.seed);
+simpleKeyring.addFromUri(assetOwner.uri);
 const wallet = new Wallet();
 const passphrase = 'passphrase';
 await wallet.createNewVault(passphrase);
@@ -60,7 +56,7 @@ await ga.create({initialIssuance: 100}).signAndSend(assetOwner.address);
 await ga.getNextAssetId();
 
 // get total supply
-await ga.getTotalgIssuance(testAsset.id)
+await ga.getInitialIssuance(testAsset.id)
 
 // get free balance
 await ga.getFreeBalance(testAsset.id, assetOwner.address)
@@ -73,9 +69,11 @@ const transferAmount = 7;
 await ga.transfer(testAsset.id, receiver.address, transferAmount).signAndSend(assetOwner.address);
 ```
 
+
+
 # USAGE (Rxjs)
 ```
-const {GenericAssetRx} = require('cennznet-generic-asset')
+const {GenericAssetRx} = require('@cennznet/generic-asset')
 const ga = await GenericAssetRx.create(api).toPromise();
 ```
 
@@ -110,24 +108,28 @@ ga.transfer('CENNZ', receiver.address, transferAmount);
 
 if the symbol passed in is not a valid reserved asset, an error will be thrown
 
+
+
 # DEMO CODE
 ```
 // get the ID of the created asset from the returned event
-await ga.create({totalSupply: 100}).signAndSend(assetOwner.address, (status) => {
-    if (status.type === 'Finalised' && status.events !== undefined) {
-        for(let i = 0; i < status.events.length; i += 1) {
-            if (status.events[i].event.method === 'Created') {
-                // get created asset ID from the returned event
-                const assetId = new AssetId(event.event.data[0]);
+await ga.create({totalSupply: 100}).signAndSend(assetOwner.address, ({events, status}) => {
+    if (status.isFinalized && events !== undefined) {
+        for(let i = 0; i < events.length; i += 1) {
+            const event = events[i].event;
+            if (event.method === 'Created') {
+                // do something
             }
         }
     }
 });
 ```
 
+
+
 # PEER DEPENDENCIES
 ```
-@cennznet/api
-@cennznet/types
-@cennznet/util
+"@cennznet/api": ">= 0.13.1",
+"@cennznet/types": ">= 0.13.1",
+"@cennznet/util": ">= 0.13.1"
 ```
