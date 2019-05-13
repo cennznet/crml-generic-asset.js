@@ -17,6 +17,7 @@ import {AccountId, AccountIndex, Address} from '@cennznet/types/polkadot';
 import {AnyNumber, CodecArg, IHash} from '@cennznet/types/polkadot.types';
 import BN from 'bn.js';
 import {Observable} from 'rxjs';
+import {AssetBalance} from './registry/AssetBalance';
 import EnhancedAssetId from './registry/EnhancedAssetId';
 
 export type AnyAddress = BN | Address | AccountId | AccountIndex | Array<number> | Uint8Array | number | string;
@@ -50,12 +51,12 @@ export interface IAssetOptions {
 }
 
 export interface QueryableGetBalance {
-    (assetId: AnyNumber, address: AnyAddress): Promise<BN>;
+    (assetId: AnyNumber, address: AnyAddress): Promise<AssetBalance>;
     (assetId: AnyNumber, address: AnyAddress, cb: any): Promise<() => any>;
-    at(hash: IHash, assetId: AnyNumber, address: AnyAddress): Promise<BN>;
+    at(hash: IHash, assetId: AnyNumber, address: AnyAddress): Promise<AssetBalance>;
 }
 
 export interface QueryableGetBalanceRx {
-    (assetId: AnyNumber, address: AnyAddress): Observable<BN>;
-    at(hash: IHash, assetId: AnyNumber, address: AnyAddress): Observable<BN>;
+    (assetId: AnyNumber, address: AnyAddress): Observable<AssetBalance>;
+    at(hash: IHash, assetId: AnyNumber, address: AnyAddress): Observable<AssetBalance>;
 }

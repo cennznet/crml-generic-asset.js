@@ -21,6 +21,7 @@ import {Hash} from '@cennznet/types/polkadot';
 import {SimpleKeyring, Wallet} from '@cennznet/wallet';
 
 import {GenericAsset} from '../src/GenericAsset';
+import {AssetBalance} from '../src/registry/AssetBalance';
 
 const assetOwner = {
     address: '5DXUeE5N5LtkW97F2PzqYPyqNkxqSWESdGSPTX6AvkUAhwKP',
@@ -32,6 +33,7 @@ const receiver = {
 const testAsset = {
     id: 16000,
     symbol: 'CENNZ-T',
+    decimals: 18,
     ownerAccount: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT',
     totalSupply: '20000000000000000000000000000'
 };
@@ -120,6 +122,8 @@ describe('Generic asset APIs', () => {
         it('queries free balance', async () => {
             const balance = await ga.getFreeBalance(testAsset.id, assetOwner.address);
             expect(balance).toBeDefined;
+            expect(balance).toBeInstanceOf(AssetBalance);
+            expect(balance.decimals).toBe(testAsset.decimals);
         });
 
         it('queries free balance with At', async () => {
@@ -159,6 +163,8 @@ describe('Generic asset APIs', () => {
         it('queries reserved balance', async () => {
             const balance = await ga.getReservedBalance(testAsset.id, assetOwner.address);
             expect(balance).toBeDefined;
+            expect(balance).toBeInstanceOf(AssetBalance);
+            expect(balance.decimals).toBe(testAsset.decimals);
         });
 
         it('queries reserved balance with At', async () => {
@@ -190,6 +196,8 @@ describe('Generic asset APIs', () => {
         it('returns total extrinsic', async () => {
             const balance = await ga.getTotalIssuance(testAsset.id);
             expect(balance.toString()).toEqual(testAsset.totalSupply);
+            expect(balance).toBeInstanceOf(AssetBalance);
+            expect(balance.decimals).toBe(testAsset.decimals);
         })
     });
 
