@@ -16,7 +16,6 @@ import {IPlugin} from '@cennznet/api/types';
 import * as derives from './derives';
 import {GenericAsset} from './GenericAsset';
 import {GenericAssetRx} from './GenericAssetRx';
-import {AssetBalance} from './registry/AssetBalance';
 import EnhancedAssetId from './registry/EnhancedAssetId';
 
 export default {
@@ -25,7 +24,6 @@ export default {
     sdkRxClass: GenericAssetRx,
     types: {
         AssetId: EnhancedAssetId,
-        Balance: AssetBalance,
     },
     derives: {
         genericAsset: derives,

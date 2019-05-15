@@ -14,10 +14,10 @@
 
 import {AssetId} from '@cennznet/types';
 import {assert, isString} from '@cennznet/util';
+import {ASSET_DECIMALS, MAX_RESERVE_ID} from '../constants';
 import {AssetType, IAsset} from '../types';
 import {isAssetObj, isStringNumber} from '../utils/utils';
 import {findAssetById, findAssetBySymbol} from './assetRegistry';
-import {MAX_RESERVE_ID} from './constants';
 
 /**
  * enhance AssetId with addition info like symbol, decimals, asset type if it is a reserved asset
@@ -54,9 +54,10 @@ export default class EnhancedAssetId extends AssetId {
 
     /**
      * decimals of asset for reserved asset
+     * @deprecated decimals will always be 18 with no exception
      */
     get decimals() {
-        return this._asset ? this._asset.decimals : undefined;
+        return ASSET_DECIMALS;
     }
 
     /**

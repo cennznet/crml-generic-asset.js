@@ -21,21 +21,19 @@ import {Hash} from '@cennznet/types/polkadot';
 import {SimpleKeyring, Wallet} from '@cennznet/wallet';
 
 import {GenericAsset} from '../src/GenericAsset';
-import {AssetBalance} from '../src/registry/AssetBalance';
 
 const assetOwner = {
     address: '5DXUeE5N5LtkW97F2PzqYPyqNkxqSWESdGSPTX6AvkUAhwKP',
     uri: '//cennznet-js-test',
 };
 const receiver = {
-    address: '5ESNjjzmZnnCdrrpUo9TBKhDV1sakTjkspw2ZGg84LAK1e1Y'
+    address: '5ESNjjzmZnnCdrrpUo9TBKhDV1sakTjkspw2ZGg84LAK1e1Y',
 };
 const testAsset = {
     id: 16000,
     symbol: 'CENNZ-T',
-    decimals: 18,
     ownerAccount: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT',
-    totalSupply: '20000000000000000000000000000'
+    totalSupply: '20000000000000000000000000000',
 };
 
 const passphrase = 'passphrase';
@@ -63,44 +61,46 @@ describe('Generic asset APIs', () => {
     });
 
     describe('create()', () => {
-        it('should create asset and return \'Created\' event when finishing', async (done) => {
+        it("should create asset and return 'Created' event when finishing", async done => {
             const totalAmount = 100;
             const assetOptions = {
                 initialIssuance: totalAmount,
             };
             await ga.create(assetOptions).signAndSend(assetOwner.address, ({events, status}: SubmittableResult) => {
                 if (status.isFinalized && events !== undefined) {
-                    for(let i = 0; i < events.length; i += 1) {
+                    for (let i = 0; i < events.length; i += 1) {
                         const event = events[i];
                         if (event.event.method === 'Created') {
                             const assetId: any = event.event.data[0];
                             // query balance
                             ga.getFreeBalance(assetId, assetOwner.address).then(balance => {
-                                expect(balance.toString()).toEqual(totalAmount.toString())
+                                expect(balance.toString()).toEqual(totalAmount.toString());
                                 done();
                             });
                         }
                     }
                 }
             });
-        })
+        });
     });
 
     describe('transfer()', () => {
-        it('transfer asset to target account', async (done) => {
+        it('transfer asset to target account', async done => {
             const transferAmount = 7;
             const balanceBefore = await ga.getFreeBalance(testAsset.id, assetOwner.address);
             expect(balanceBefore).toBeDefined;
-            await ga.transfer(testAsset.id, receiver.address, transferAmount).signAndSend(assetOwner.address, ({events, status}: SubmittableResult) => {
-                if (status.isFinalized && events !== undefined) {
-                    ga.getFreeBalance(testAsset.id, assetOwner.address).then((balanceAfter) => {
-                        expect((balanceBefore.sub(balanceAfter)).toString()).toEqual(transferAmount.toString());
-                        done();
-                    });
-                }
-            });
+            await ga
+                .transfer(testAsset.id, receiver.address, transferAmount)
+                .signAndSend(assetOwner.address, ({events, status}: SubmittableResult) => {
+                    if (status.isFinalized && events !== undefined) {
+                        ga.getFreeBalance(testAsset.id, assetOwner.address).then(balanceAfter => {
+                            expect(balanceBefore.sub(balanceAfter).toString()).toEqual(transferAmount.toString());
+                            done();
+                        });
+                    }
+                });
         });
-        it('transfer asset to target account using asset symbol', async (done) => {
+        it('transfer asset to target account using asset symbol', async done => {
             const transferAmount = 7;
             const transferAsset = testAsset.symbol;
             const balanceBefore = await ga.getFreeBalance(transferAsset, assetOwner.address);
@@ -110,7 +110,7 @@ describe('Generic asset APIs', () => {
             await tx.signAndSend(assetOwner.address, ({events, status}: SubmittableResult) => {
                 if (status.isFinalized && events !== undefined) {
                     ga.getFreeBalance(transferAsset, assetOwner.address).then(balanceAfter => {
-                        expect((balanceBefore.sub(balanceAfter)).toString()).toEqual(transferAmount.toString());
+                        expect(balanceBefore.sub(balanceAfter).toString()).toEqual(transferAmount.toString());
                         done();
                     });
                 }
@@ -122,30 +122,28 @@ describe('Generic asset APIs', () => {
         it('queries free balance', async () => {
             const balance = await ga.getFreeBalance(testAsset.id, assetOwner.address);
             expect(balance).toBeDefined;
-            expect(balance).toBeInstanceOf(AssetBalance);
-            expect(balance.decimals).toBe(testAsset.decimals);
         });
 
         it('queries free balance with At', async () => {
             const balance = await ga.getFreeBalance(testAsset.id, assetOwner.address);
             const blockHash = (await api.rpc.chain.getBlockHash()) as Hash;
             const balanceAt = await ga.getFreeBalance.at(blockHash, testAsset.id, assetOwner.address);
-            expect(balance).toEqual(balanceAt)
+            expect(balance).toEqual(balanceAt);
         });
 
-        it('queries free balance with subscribe', async (done) => {
+        it('queries free balance with subscribe', async done => {
             const balance = await ga.getFreeBalance(testAsset.id, assetOwner.address);
             let counter1 = 1;
             let counter2 = 1;
             const transferAmount = 7;
-            const unsubscribeFn = await ga.getFreeBalance(testAsset.id, assetOwner.address, (balanceSubscribe) => {
+            const unsubscribeFn = await ga.getFreeBalance(testAsset.id, assetOwner.address, balanceSubscribe => {
                 switch (counter1) {
                     case 1:
                         expect(balance.toString()).toEqual(balanceSubscribe.toString());
                         break;
                     default:
                         if (balance.toString() !== balanceSubscribe.toString()) {
-                            expect((balance.subn(transferAmount)).toString()).toEqual(balanceSubscribe.toString());
+                            expect(balance.subn(transferAmount).toString()).toEqual(balanceSubscribe.toString());
                             unsubscribeFn();
                             done();
                         }
@@ -156,69 +154,65 @@ describe('Generic asset APIs', () => {
 
             // transfer to change balance value for triggering subscribe
             ga.transfer(testAsset.id, receiver.address, transferAmount).signAndSend(assetOwner.address);
-        })
+        });
     });
 
     describe('queryReservedBalance()', () => {
         it('queries reserved balance', async () => {
             const balance = await ga.getReservedBalance(testAsset.id, assetOwner.address);
             expect(balance).toBeDefined;
-            expect(balance).toBeInstanceOf(AssetBalance);
-            expect(balance.decimals).toBe(testAsset.decimals);
         });
 
         it('queries reserved balance with At', async () => {
             const balance = await ga.getReservedBalance(testAsset.id, assetOwner.address);
             const blockHash = (await api.rpc.chain.getBlockHash()) as Hash;
             const balanceAt = await ga.getReservedBalance.at(blockHash, testAsset.id, assetOwner.address);
-            expect(balance).toEqual(balanceAt)
+            expect(balance).toEqual(balanceAt);
         });
 
-        it('queries reserved balance with subscribe', async (done) => {
+        it('queries reserved balance with subscribe', async done => {
             const balance = await ga.getReservedBalance(testAsset.id, assetOwner.address);
-            const unsubscribeFn = await ga.getReservedBalance(testAsset.id, assetOwner.address, (balanceSubscribe) => {
+            const unsubscribeFn = (await ga.getReservedBalance(testAsset.id, assetOwner.address, balanceSubscribe => {
                 expect(balance.toString()).toEqual(balanceSubscribe.toString());
                 done();
-            }) as any;
+            })) as any;
             unsubscribeFn();
-        })
+        });
     });
 
     describe('queryNextAssetId()', () => {
         it('returns next assetId', () => {
             ga.getNextAssetId().then(assetId => {
                 expect(assetId).toBeDefined;
-            })
-        })
+            });
+        });
     });
 
     describe('queryTotalIssuance()', () => {
         it('returns total extrinsic', async () => {
             const balance = await ga.getTotalIssuance(testAsset.id);
             expect(balance.toString()).toEqual(testAsset.totalSupply);
-            expect(balance).toBeInstanceOf(AssetBalance);
-            expect(balance.decimals).toBe(testAsset.decimals);
-        })
+        });
     });
 
     describe('queryTotalBalance()', () => {
         it('queries total balance', async () => {
-            const [freeBalance,reservedBalance,totalBalance] = [
+            const [freeBalance, reservedBalance, totalBalance] = [
                 await ga.getFreeBalance(testAsset.id, assetOwner.address),
                 await ga.getReservedBalance(testAsset.id, assetOwner.address),
-                await ga.getTotalBalance(testAsset.id, assetOwner.address)
+                await ga.getTotalBalance(testAsset.id, assetOwner.address),
             ];
-            expect(freeBalance.add(reservedBalance).toString()).toEqual(totalBalance.toString())
+            expect(freeBalance.add(reservedBalance).toString()).toEqual(totalBalance.toString());
         });
 
         it('queries total balance with At', async () => {
             const blockHash = (await api.rpc.chain.getBlockHash()) as Hash;
-            const [freeBalance,reservedBalance,totalBalance] = [
+            const [freeBalance, reservedBalance, totalBalance] = [
                 await ga.getFreeBalance.at(blockHash, testAsset.id, assetOwner.address),
                 await ga.getReservedBalance.at(blockHash, testAsset.id, assetOwner.address),
-                await ga.getTotalBalance.at(blockHash, testAsset.id, assetOwner.address)
+                await ga.getTotalBalance.at(blockHash, testAsset.id, assetOwner.address),
             ];
-            expect(freeBalance.add(reservedBalance).toString()).toEqual(totalBalance.toString())
+            expect(freeBalance.add(reservedBalance).toString()).toEqual(totalBalance.toString());
         });
-    })
+    });
 });

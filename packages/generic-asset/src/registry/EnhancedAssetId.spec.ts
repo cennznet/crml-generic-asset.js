@@ -14,8 +14,8 @@
 
 import {AssetId} from '@cennznet/types';
 import {isBn} from '@cennznet/util';
+import {MAX_RESERVE_ID} from '../constants';
 import {AssetType} from '../types';
-import {MAX_RESERVE_ID} from './constants';
 import EnhancedAssetId from './EnhancedAssetId';
 
 const CENTRAPAY = {

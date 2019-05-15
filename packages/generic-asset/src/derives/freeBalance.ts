@@ -13,12 +13,11 @@
 // limitations under the License.
 
 import {ApiInterface$Rx} from '@cennznet/api/polkadot.types';
-import {Address, Data, Hash, Option, Vector} from '@cennznet/types/polkadot';
+import {Address, Balance, Data, Hash, Option, Vector} from '@cennznet/types/polkadot';
 import {drr} from '@plugnet/api-derive/util/drr';
 import BN from 'bn.js';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {AssetBalance} from '../registry/AssetBalance';
 import EnhancedAssetId from '../registry/EnhancedAssetId';
 import {AnyAddress, AnyAssetId} from '../types';
 import {generateStorageDoubleMapKey} from '../utils/utils';
@@ -26,12 +25,11 @@ import {generateStorageDoubleMapKey} from '../utils/utils';
 const PREFIX = 'GenericAsset FreeBalance';
 
 export function freeBalance(api: ApiInterface$Rx) {
-    return (_assetId: AnyAssetId, address: AnyAddress): Observable<BN> => {
-        const assetId = new EnhancedAssetId(_assetId);
-        const key = generateStorageDoubleMapKey(PREFIX, assetId, new Address(address));
+    return (assetId: AnyAssetId, address: AnyAddress): Observable<BN> => {
+        const key = generateStorageDoubleMapKey(PREFIX, new EnhancedAssetId(assetId), new Address(address));
         return api.rpc.state.subscribeStorage([key]).pipe(
             map(([data]: Vector<Option<Data>>) => {
-                return new AssetBalance(data.unwrapOr(undefined), assetId.decimals);
+                return new Balance(data.unwrapOr(undefined));
             }),
             drr()
         );
@@ -39,12 +37,11 @@ export function freeBalance(api: ApiInterface$Rx) {
 }
 
 export function freeBalanceAt(api: ApiInterface$Rx) {
-    return (hash: Hash, _assetId: AnyAssetId, address: AnyAddress): Observable<BN> => {
-        const assetId = new EnhancedAssetId(_assetId);
-        const key = generateStorageDoubleMapKey(PREFIX, assetId, new Address(address));
+    return (hash: Hash, assetId: AnyAssetId, address: AnyAddress): Observable<BN> => {
+        const key = generateStorageDoubleMapKey(PREFIX, new EnhancedAssetId(assetId), new Address(address));
         return api.rpc.state.getStorage(key, hash).pipe(
             map((data: Option<Data>) => {
-                return new AssetBalance(data.unwrapOr(undefined), assetId.decimals);
+                return new Balance(data.unwrapOr(undefined));
             }),
             drr()
         );

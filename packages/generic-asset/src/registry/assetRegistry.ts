@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {defaultAssets} from '../constants';
 import {IAsset} from '../types';
-import {defaultAssets} from './constants';
 
 export function findAssetById(assetId: number): IAsset | undefined {
     return defaultAssets.find(asset => asset.id === assetId);
