@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://bitbucket.org/centralitydev/cennznet-js-generic-asset/compare/v0.8.0...v0.8.1) (2019-05-21)
+
+
+### Bug Fixes
+
+* revert change of AssetBalance ([d6c817b](https://bitbucket.org/centralitydev/cennznet-js-generic-asset/commits/d6c817b)), closes [#27](https://bitbucket.org/centralitydev/cennznet-js-generic-asset/issue/27)
+
+
+### Features
+
+* queries return as AssetBalance which support unit conversions ([0ab5f76](https://bitbucket.org/centralitydev/cennznet-js-generic-asset/commits/0ab5f76)), closes [#26](https://bitbucket.org/centralitydev/cennznet-js-generic-asset/issue/26)
+
+
+
+
+
 # [0.8.0](https://bitbucket.org/centralitydev/cennznet-js-generic-asset/compare/v0.7.3...v0.8.0) (2019-05-13)
 
 
