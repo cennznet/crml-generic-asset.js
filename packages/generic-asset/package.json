@@ -2,7 +2,6 @@
   "name": "@cennznet/crml-generic-asset",
   "version": "0.8.1",
   "description": "the javascript sdk for cennznet runtime module: Generic Asset. also a plugin of @cennznet/api",
-  "private": true,
   "engines": {
     "node": "^10.13.0",
     "yarn": "^1.12.3"
