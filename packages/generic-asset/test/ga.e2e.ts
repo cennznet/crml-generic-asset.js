@@ -84,6 +84,96 @@ describe('Generic asset APIs', () => {
                 });
             });
         });
+
+        describe('mint()', () => {
+            it('should mint an amount of an asset to the specified address', async () => {
+                // Arrange
+                const {address} = assetOwner;
+
+                const initialIssuance = 100;
+                const mintAmount = 100;
+                const expectedBalance = initialIssuance + mintAmount;
+
+                const permissions = {mint: address};
+
+                const assetId: number = await new Promise((resolve, reject) => {
+                    ga.create({initialIssuance, permissions}).signAndSend(address, ({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                if (event.method === "Created") {
+                                    resolve(+event.data[0]);
+                                }
+                            }
+                            reject('No "Created" event was emitted while creating asset.');
+                        }
+                    });
+                });
+
+                // Act
+                await new Promise((resolve, reject) => {
+                    ga.mint(assetId, address, mintAmount).signAndSend(address, ({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                // TODO: Once https://github.com/cennznet/cennznet/pull/16 is released, this 
+                                // should be be updated to resolve only when a "Minted" event is raised.
+                                if (event.method === "ExtrinsicSuccess") {
+                                    resolve();
+                                }
+                            }
+                            reject('No "ExtrinsicSuccess" event was emitted while minting asset.');
+                        }
+                    });
+                });
+
+                // Assert
+                expect(+(await ga.getFreeBalance(assetId, address))).toBe(expectedBalance);
+            });
+        });
+
+        describe('burn()', () => {
+            it('should burn an amount of an asset from the specified address', async () => {
+                // Arrange
+                const {address} = assetOwner;
+
+                const initialIssuance = 100;
+                const burnAmount = 100;
+                const expectedBalance = initialIssuance - burnAmount;
+
+                const permissions = {burn: address};
+
+                const assetId: number = await new Promise((resolve, reject) => {
+                    ga.create({initialIssuance, permissions}).signAndSend(address, ({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                if (event.method === "Created") {
+                                    resolve(+event.data[0]);
+                                }
+                            }
+                            reject('No "Created" event was emitted while creating asset.');
+                        }
+                    });
+                });
+
+                // Act
+                await new Promise((resolve, reject) => {
+                    ga.burn(assetId, address, burnAmount).signAndSend(address, ({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                // TODO: Once https://github.com/cennznet/cennznet/pull/16 is released, this 
+                                // should be be updated to resolve only when a "Burned" event is raised.
+                                if (event.method === "ExtrinsicSuccess") {
+                                    resolve();
+                                }
+                            }
+                            reject('No "ExtrinsicSuccess" event was emitted while burning asset.');
+                        }
+                    });
+                });
+
+                // Assert
+                expect(+(await ga.getFreeBalance(assetId, address))).toBe(expectedBalance);
+            });
+        });
     });
 
     describe('transfer()', () => {
