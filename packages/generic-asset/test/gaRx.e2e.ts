@@ -40,8 +40,8 @@ const testAsset = {
 };
 
 const passphrase = 'passphrase';
-// const urlUatKauri = 'wss://kauri.centrality.me/ws?apikey=aa2ce32f-cf4a-40f7-9d40-897808dae4b5';
-const url = 'wss://cennznet-node-0.centrality.me:9944';
+
+const url = 'wss://rimu.unfrastructure.io/public/ws';
 
 describe('Generic asset Rx APIs', () => {
     let api: ApiRx;
