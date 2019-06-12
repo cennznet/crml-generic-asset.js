@@ -63,43 +63,45 @@ describe('Generic asset Rx APIs', () => {
         ((api as any)._rpc._provider as any).websocket.close();
     });
 
-    describe.only('create()', () => {
-        it('should create asset and return \'Created\' event when finishing', (done) => {
-            const totalAmount = 100;
-            const assetOptions = {
-                initialIssuance: totalAmount
-            };
-            ga.create(assetOptions).signAndSend(assetOwner.address)
-                .pipe(
-                    filter(({events, status}: SubmittableResult) => {
-                        let isCreated = false;
-                        if (status.isFinalized && events !== undefined) {
-                            for (let i = 0; i < events.length; i += 1) {
-                                const event = events[i];
-                                if (event.event.method === 'Created') {
-                                    isCreated = true;
+    describe.only('tests which work!', () => {
+        describe('create()', () => {
+            it('should create asset and return \'Created\' event when finishing', (done) => {
+                const totalAmount = 100;
+                const assetOptions = {
+                    initialIssuance: totalAmount
+                };
+                ga.create(assetOptions).signAndSend(assetOwner.address)
+                    .pipe(
+                        filter(({events, status}: SubmittableResult) => {
+                            let isCreated = false;
+                            if (status.isFinalized && events !== undefined) {
+                                for (let i = 0; i < events.length; i += 1) {
+                                    const event = events[i];
+                                    if (event.event.method === 'Created') {
+                                        isCreated = true;
+                                    }
                                 }
                             }
-                        }
-                        return isCreated;
-                    }),
-                    switchMap(({events, status}: SubmittableResult) => {
-                        let event;
-                        for (let i = 0; i < events.length; i += 1) {
-                            if (events[i].event.method === 'Created') {
-                                event = events[i];
+                            return isCreated;
+                        }),
+                        switchMap(({events, status}: SubmittableResult) => {
+                            let event;
+                            for (let i = 0; i < events.length; i += 1) {
+                                if (events[i].event.method === 'Created') {
+                                    event = events[i];
+                                }
                             }
-                        }
-                        const assetId: any = event.event.data[0];
-                        return ga.getFreeBalance(assetId, assetOwner.address);
-                    }),
-                    first()
-                )
-                .subscribe((balance) => {
-                    expect(balance.toString()).toEqual(totalAmount.toString());
-                    done();
-                });
-        })
+                            const assetId: any = event.event.data[0];
+                            return ga.getFreeBalance(assetId, assetOwner.address);
+                        }),
+                        first()
+                    )
+                    .subscribe((balance) => {
+                        expect(balance.toString()).toEqual(totalAmount.toString());
+                        done();
+                    });
+            })
+        });
     });
 
     describe('transfer()', () => {
