@@ -14,7 +14,7 @@
 
 import {AssetId} from '@cennznet/types';
 import {isBn} from '@cennznet/util';
-import {MAX_RESERVE_ID} from '../constants';
+import {ASSET_DECIMALS, MAX_RESERVE_ID} from '../constants';
 import {AssetType} from '../types';
 import EnhancedAssetId from './EnhancedAssetId';
 
@@ -48,7 +48,7 @@ describe('EnhancedAssetId', () => {
             expect(enhanced.toNumber()).toEqual(MAX_RESERVE_ID + 1);
             expect(enhanced.isReserve()).toBeFalsy();
             expect(enhanced.symbol).toBeUndefined();
-            expect(enhanced.decimals).toBeUndefined();
+            expect(enhanced.decimals).toEqual(ASSET_DECIMALS);
             expect(enhanced.type).toEqual(AssetType.USER);
         });
 

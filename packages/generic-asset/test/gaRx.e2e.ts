@@ -40,8 +40,8 @@ const testAsset = {
 };
 
 const passphrase = 'passphrase';
-// const urlUatKauri = 'wss://kauri.centrality.me/ws?apikey=aa2ce32f-cf4a-40f7-9d40-897808dae4b5';
-const url = 'wss://cennznet-node-0.centrality.me:9944';
+
+const url = 'wss://rimu.unfrastructure.io/public/ws';
 
 describe('Generic asset Rx APIs', () => {
     let api: ApiRx;
@@ -63,43 +63,135 @@ describe('Generic asset Rx APIs', () => {
         ((api as any)._rpc._provider as any).websocket.close();
     });
 
-    describe.only('create()', () => {
-        it('should create asset and return \'Created\' event when finishing', (done) => {
-            const totalAmount = 100;
-            const assetOptions = {
-                initialIssuance: totalAmount
-            };
-            ga.create(assetOptions).signAndSend(assetOwner.address)
-                .pipe(
-                    filter(({events, status}: SubmittableResult) => {
-                        let isCreated = false;
-                        if (status.isFinalized && events !== undefined) {
-                            for (let i = 0; i < events.length; i += 1) {
-                                const event = events[i];
-                                if (event.event.method === 'Created') {
-                                    isCreated = true;
+    describe.only('tests which work!', () => {
+        describe('create()', () => {
+            it('should create asset and return \'Created\' event when finishing', (done) => {
+                const totalAmount = 100;
+                const assetOptions = {
+                    initialIssuance: totalAmount
+                };
+                ga.create(assetOptions).signAndSend(assetOwner.address)
+                    .pipe(
+                        filter(({events, status}: SubmittableResult) => {
+                            let isCreated = false;
+                            if (status.isFinalized && events !== undefined) {
+                                for (let i = 0; i < events.length; i += 1) {
+                                    const event = events[i];
+                                    if (event.event.method === 'Created') {
+                                        isCreated = true;
+                                    }
                                 }
                             }
-                        }
-                        return isCreated;
-                    }),
-                    switchMap(({events, status}: SubmittableResult) => {
-                        let event;
-                        for (let i = 0; i < events.length; i += 1) {
-                            if (events[i].event.method === 'Created') {
-                                event = events[i];
+                            return isCreated;
+                        }),
+                        switchMap(({events, status}: SubmittableResult) => {
+                            let event;
+                            for (let i = 0; i < events.length; i += 1) {
+                                if (events[i].event.method === 'Created') {
+                                    event = events[i];
+                                }
                             }
+                            const assetId: any = event.event.data[0];
+                            return ga.getFreeBalance(assetId, assetOwner.address);
+                        }),
+                        first()
+                    )
+                    .subscribe((balance) => {
+                        expect(balance.toString()).toEqual(totalAmount.toString());
+                        done();
+                    });
+            })
+        });
+
+        describe('mint()', () => {
+            it('should mint an amount of an asset to the specified address', async () => {
+                // Arrange
+                const {address} = assetOwner;
+
+                const initialIssuance = 100;
+                const mintAmount = 100;
+                const expectedBalance = initialIssuance + mintAmount;
+
+                const permissions = {mint: address};
+
+                const assetId: number = await new Promise((resolve, reject) => {
+                    ga.create({initialIssuance, permissions}).signAndSend(address).subscribe(({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                if (event.method === "Created") {
+                                    resolve(+event.data[0]);
+                                }
+                            }
+                            reject('No "Created" event was emitted while creating asset.');
                         }
-                        const assetId: any = event.event.data[0];
-                        return ga.getFreeBalance(assetId, assetOwner.address);
-                    }),
-                    first()
-                )
-                .subscribe((balance) => {
-                    expect(balance.toString()).toEqual(totalAmount.toString());
-                    done();
+                    });
                 });
-        })
+
+                // Act
+                await new Promise((resolve, reject) => {
+                    ga.mint(assetId, address, mintAmount).signAndSend(address).subscribe(({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                // TODO: Once https://github.com/cennznet/cennznet/pull/16 is released, this 
+                                // should be be updated to resolve only when a "Minted" event is raised.
+                                if (event.method === "ExtrinsicSuccess") {
+                                    resolve();
+                                }
+                            }
+                            reject('No "ExtrinsicSuccess" event was emitted while minting asset.');
+                        }
+                    });
+                });
+
+                // Assert
+                expect(+(await ga.getFreeBalance(assetId, address).pipe(first()).toPromise())).toBe(expectedBalance);
+            });
+        });
+
+        describe('burn()', () => {
+            it('should burn an amount of an asset from the specified address', async () => {
+                // Arrange
+                const {address} = assetOwner;
+
+                const initialIssuance = 100;
+                const burnAmount = 100;
+                const expectedBalance = initialIssuance - burnAmount;
+
+                const permissions = {burn: address};
+
+                const assetId: number = await new Promise((resolve, reject) => {
+                    ga.create({initialIssuance, permissions}).signAndSend(address).subscribe(({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                if (event.method === "Created") {
+                                    resolve(+event.data[0]);
+                                }
+                            }
+                            reject('No "Created" event was emitted while creating asset.');
+                        }
+                    });
+                });
+
+                // Act
+                await new Promise((resolve, reject) => {
+                    ga.burn(assetId, address, burnAmount).signAndSend(address).subscribe(({status, events}) => {
+                        if (status.isFinalized) {
+                            for (const {event} of events) {
+                                // TODO: Once https://github.com/cennznet/cennznet/pull/16 is released, this 
+                                // should be be updated to resolve only when a "Burned" event is raised.
+                                if (event.method === "ExtrinsicSuccess") {
+                                    resolve();
+                                }
+                            }
+                            reject('No "ExtrinsicSuccess" event was emitted while burning asset.');
+                        }
+                    });
+                });
+
+                // Assert
+                expect(+(await ga.getFreeBalance(assetId, address).pipe(first()).toPromise())).toBe(expectedBalance);
+            });
+        });
     });
 
     describe('transfer()', () => {

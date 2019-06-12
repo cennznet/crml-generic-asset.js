@@ -72,6 +72,34 @@ export class GenericAsset {
     }
 
     /**
+     * Mint asset to the destination account
+     * @param assetId The ID or symbol (for reserved asset) of the asset to be minted
+     * @param destination The address of the destination account
+     * @param amount The amount to be minted
+     */
+    mint(
+        assetId: AnyAssetId,
+        destination: AnyAddress,
+        amount: AnyNumber
+    ): SubmittableExtrinsic<Promise<Hash>, Promise<() => any>> {
+        return this.api.tx.genericAsset.mint(new EnhancedAssetId(assetId), destination, amount);
+    }
+
+    /**
+     * Burn asset from the source account
+     * @param assetId The ID or symbol (for reserved asset) of the asset to be minted
+     * @param source The address of the source account
+     * @param amount The amount to be burned
+     */
+    burn(
+        assetId: AnyAssetId,
+        source: AnyAddress,
+        amount: AnyNumber
+    ): SubmittableExtrinsic<Promise<Hash>, Promise<() => any>> {
+        return this.api.tx.genericAsset.burn(new EnhancedAssetId(assetId), source, amount);
+    }
+
+    /**
      * Query the next available asset ID
      */
     get getNextAssetId(): QueryableStorageFunction<Promise<EnhancedAssetId>, Promise<() => any>> {
