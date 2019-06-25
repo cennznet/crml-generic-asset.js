@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "module": "none",
-        "target": "esnext",
+        "module": "commonjs",
+        "target": "es2017",
         "noImplicitAny": false,
         "moduleResolution": "node",
         "outDir": "build",
@@ -10,16 +10,16 @@
         "experimentalDecorators": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "lib": ["es2017"],
+        "lib": ["ES2017"],
         "emitDecoratorMetadata": true,
         "declaration": true,
-        "declarationDir": "build",
         "sourceMap": true,
         "inlineSources": true,
         "paths": {
-            "@cennznet/crml-generic-asset/*": ["src/*"],
-            "@cennznet/crml-generic-asset": ["src/index"]
+            "@cennznet/crml-generic-asset/*": ["packages/generic-asset/src/*"],
+            "@cennznet/crml-generic-asset": ["packages/generic-asset/src/index"]
         }
     },
-    "include": ["src/**/*"]
+    "include": ["packages/**/*"],
+    "exclude": ["**/node_modules/**"]
 }

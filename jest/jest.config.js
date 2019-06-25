@@ -22,9 +22,13 @@ module.exports = {
             statements: -10,
         },
     },
-    testEnvironment: '../../jest/env.js',
+    testEnvironment: './jest/env.js',
     moduleNameMapper: {
-        '@cennznet/crml-generic-asset(.*)$': '<rootDir>/src/$1'
+        '@cennznet/crml-generic-asset(.*)$': '<rootDir>/packages/generic-asset/src/$1'
     },
-    setupFilesAfterEnv: ['../../jest/jest.setup.js']
+    modulePathIgnorePatterns: [
+        '<rootDir>/build',
+        '<rootDir>/packages/generic-asset/build'
+    ],
+    setupFilesAfterEnv: ['./jest/jest.setup.js']
 };
