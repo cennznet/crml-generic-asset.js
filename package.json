@@ -10,9 +10,13 @@
     ],
     "scripts": {
         "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r1",
-        "lint": "tslint -c tslint.json --project ./packages/generic-asset"
+        "lint": "npx tslint -c tslint.json --project . && npx prettier --list-different './packages/**/src/*.ts'",
+        "build": "plugnet-dev-build-ts",
+        "test": "jest -c ./jest/jest.config.js --coverage spec",
+        "test:e2e": "jest -c ./jest/jest.config.js --silent --runInBand --detectOpenHandles e2e"
     },
     "devDependencies": {
+        "@plugnet/dev": "^0.30.6",
         "@types/jest": "^23.3.10",
         "cpx": "^1.5.0",
         "cz-lerna-changelog": "^2.0.2",

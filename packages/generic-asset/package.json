@@ -19,9 +19,6 @@
     "url": "git@github.com:cennznet/crml-generic-asset.js.git"
   },
   "scripts": {
-    "build": "rimraf build && tsc -b",
-    "test:unit": "jest -c ../../jest/jest.config.js spec",
-    "test:e2e": "jest --silent --runInBand --detectOpenHandles -c ../../jest/jest.config.js e2e"
   },
   "peerDependencies": {
     "@cennznet/api": ">= 0.13.1",
