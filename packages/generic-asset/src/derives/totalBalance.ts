@@ -13,19 +13,20 @@
 // limitations under the License.
 
 import {ApiInterface$Rx} from '@cennznet/api/polkadot.types';
-import {Hash} from '@cennznet/types/polkadot';
+import {Balance, Hash} from '@cennznet/types/polkadot';
 import {drr} from '@plugnet/api-derive/util/drr';
 import BN from 'bn.js';
 import {combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {AnyAddress, AnyAssetId} from '../types';
-import {freeBalance, freeBalanceAt} from './freeBalance';
-import {reservedBalance, reservedBalanceAt} from './reservedBalance';
 
 export function totalBalance(api: ApiInterface$Rx) {
     return (assetId: AnyAssetId, address: AnyAddress): Observable<BN> => {
-        return combineLatest(freeBalance(api)(assetId, address), reservedBalance(api)(assetId, address)).pipe(
-            map(([freeBalance, reservedBalance]) => freeBalance.add(reservedBalance)),
+        return combineLatest(
+            api.query.genericAsset.freeBalance(assetId, address),
+            api.query.genericAsset.reservedBalance(assetId, address)
+        ).pipe(
+            map(([freeBalance, reservedBalance]) => (freeBalance as Balance).add(reservedBalance as Balance)),
             drr()
         );
     };
@@ -34,10 +35,10 @@ export function totalBalance(api: ApiInterface$Rx) {
 export function totalBalanceAt(api: ApiInterface$Rx) {
     return (hash: Hash, assetId: AnyAssetId, address: AnyAddress): Observable<BN> => {
         return combineLatest(
-            freeBalanceAt(api)(hash, assetId, address),
-            reservedBalanceAt(api)(hash, assetId, address)
+            api.query.genericAsset.freeBalance.at(hash, assetId, address),
+            api.query.genericAsset.reservedBalance.at(hash, assetId, address)
         ).pipe(
-            map(([freeBalance, reservedBalance]) => freeBalance.add(reservedBalance)),
+            map(([freeBalance, reservedBalance]) => (freeBalance as Balance).add(reservedBalance as Balance)),
             drr()
         );
     };

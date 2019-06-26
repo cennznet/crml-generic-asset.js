@@ -15,6 +15,7 @@
 import {ApiRx} from '@cennznet/api';
 import {SubmittableResult} from '@cennznet/api/polkadot';
 import {QueryableStorageFunction, SubmittableExtrinsic} from '@cennznet/api/polkadot.types';
+import {Balance} from '@cennznet/types/polkadot';
 import {AnyNumber, Codec} from '@cennznet/types/polkadot.types';
 import {assert} from '@cennznet/util';
 import BN from 'bn.js';
@@ -22,14 +23,7 @@ import {from, Observable, of} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import * as derives from './derives';
 import EnhancedAssetId from './registry/EnhancedAssetId';
-import {
-    AnyAddress,
-    AnyAssetId,
-    CodecArgObject,
-    IAssetOptions,
-    QueryableGetBalance,
-    QueryableGetBalanceRx,
-} from './types';
+import {AnyAddress, AnyAssetId, CodecArgObject, IAssetOptions, QueryableGetBalance} from './types';
 
 export class GenericAssetRx {
     static create(api: ApiRx): Observable<GenericAssetRx> {
@@ -129,11 +123,8 @@ export class GenericAssetRx {
      * @param assetId The id or symbol (for reserved asset) of the asset
      * @param address The address of the account
      */
-    get getFreeBalance(): QueryableGetBalanceRx {
-        const _fn = this.api.derive.genericAsset.freeBalance as any;
-        _fn.at = this.api.derive.genericAsset.freeBalanceAt as any;
-
-        return _fn;
+    get getFreeBalance(): QueryableStorageFunction<Observable<Balance>, {}> {
+        return this.api.query.genericAsset.freeBalance as any;
     }
 
     /**
@@ -141,11 +132,8 @@ export class GenericAssetRx {
      * @param assetId The id or symbol (for reserved asset) of the asset
      * @param address The address of the account
      */
-    get getReservedBalance(): QueryableGetBalanceRx {
-        const _fn = this.api.derive.genericAsset.reservedBalance as any;
-        _fn.at = this.api.derive.genericAsset.reservedBalanceAt as any;
-
-        return _fn;
+    get getReservedBalance(): QueryableStorageFunction<Observable<Balance>, {}> {
+        return this.api.query.genericAsset.reservedBalance as any;
     }
 
     /**

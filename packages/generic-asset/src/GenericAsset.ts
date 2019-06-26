@@ -14,7 +14,7 @@
 
 import {Api} from '@cennznet/api';
 import {QueryableStorageFunction, SubmittableExtrinsic} from '@cennznet/api/polkadot.types';
-import {Hash} from '@cennznet/types/polkadot';
+import {Balance, Hash} from '@cennznet/types/polkadot';
 import {AnyNumber} from '@cennznet/types/polkadot.types';
 import {assert} from '@cennznet/util';
 import BN from 'bn.js';
@@ -121,11 +121,8 @@ export class GenericAsset {
      * @param assetId The id or symbol (for reserved asset) of the asset
      * @param address The address of the account
      */
-    get getFreeBalance(): QueryableGetBalance {
-        const _fn = this.api.derive.genericAsset.freeBalance as any;
-        _fn.at = this.api.derive.genericAsset.freeBalanceAt as any;
-
-        return _fn;
+    get getFreeBalance(): QueryableStorageFunction<Promise<Balance>, Promise<() => any>> {
+        return this.api.query.genericAsset.freeBalance as any;
     }
 
     /**
@@ -133,11 +130,8 @@ export class GenericAsset {
      * @param assetId The id or symbol (for reserved asset) of the asset
      * @param address The address of the account
      */
-    get getReservedBalance(): QueryableGetBalance {
-        const _fn = this.api.derive.genericAsset.reservedBalance as any;
-        _fn.at = this.api.derive.genericAsset.reservedBalanceAt as any;
-
-        return _fn;
+    get getReservedBalance(): QueryableStorageFunction<Promise<Balance>, Promise<() => any>> {
+        return this.api.query.genericAsset.reservedBalance as any;
     }
 
     /**
