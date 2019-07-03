@@ -14,22 +14,19 @@
     "type": "git",
     "url": "git@github.com:cennznet/crml-generic-asset.js.git"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "peerDependencies": {
-    "@cennznet/api": ">= 0.13.1",
-    "@cennznet/types": ">= 0.13.1",
-    "@cennznet/util": ">= 0.13.1"
+    "@cennznet/api": ">= 0.14.1",
+    "@cennznet/types": ">= 0.14.1",
+    "@cennznet/util": ">= 0.14.1"
   },
   "devDependencies": {
-    "@cennznet/api": "^0.13.1",
-    "@cennznet/crml-cennzx-spot": "^0.5.3",
-    "@cennznet/types": "^0.13.1",
-    "@cennznet/util": "^0.13.1",
-    "@cennznet/wallet": "^0.13.1",
-    "@types/jest": "^23.3.10",
-    "jest": "24.1.0",
-    "rimraf": "^2.6.2",
-    "typescript": "^3.4.1"
+    "@cennznet/api": "^0.14.1",
+    "@cennznet/crml-cennzx-spot": "^0.6.0",
+    "@cennznet/types": "^0.14.1",
+    "@cennznet/util": "^0.14.1",
+    "@cennznet/wallet": "^0.14.1",
+    "@types/jest": "^24.0.15",
+    "jest": "24.8.0"
   }
 }
