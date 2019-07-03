@@ -32,8 +32,7 @@ const receiver = {
 const testAsset = {
     id: 16000,
     symbol: 'CENNZ-T',
-    ownerAccount: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT',
-    totalSupply: '20000000000000000000000000000',
+    ownerAccount: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT'
 };
 
 const passphrase = 'passphrase';
@@ -56,11 +55,10 @@ describe('Generic asset APIs', () => {
     });
 
     afterAll(async () => {
-        ((api as any)._rpc._provider as any).websocket.onclose = null;
-        ((api as any)._rpc._provider as any).websocket.close();
+      api.disconnect();
     });
 
-    describe.only('tests which work!', () => {
+    describe('tests which work!', () => {
         describe('create()', () => {
             it("should create asset and return 'Created' event when finishing", async done => {
                 const totalAmount = 100;
@@ -226,7 +224,6 @@ describe('Generic asset APIs', () => {
         it('queries free balance with subscribe', async done => {
             const balance = await ga.getFreeBalance(testAsset.id, assetOwner.address);
             let counter1 = 1;
-            let counter2 = 1;
             const transferAmount = 7;
             const unsubscribeFn = await ga.getFreeBalance(testAsset.id, assetOwner.address, balanceSubscribe => {
                 switch (counter1) {
@@ -283,7 +280,7 @@ describe('Generic asset APIs', () => {
     describe('queryTotalIssuance()', () => {
         it('returns total extrinsic', async () => {
             const balance = await ga.getTotalIssuance(testAsset.id);
-            expect(balance.toString()).toEqual(testAsset.totalSupply);
+            expect(balance.gtn(0)).toBeTruthy();
         });
     });
 

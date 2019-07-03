@@ -12,6 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {freeBalance, freeBalanceAt} from './freeBalance';
-export {reservedBalance, reservedBalanceAt} from './reservedBalance';
 export {totalBalance, totalBalanceAt} from './totalBalance';

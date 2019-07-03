@@ -13,13 +13,12 @@
 // limitations under the License.
 
 import {AssetId} from '@cennznet/types';
-import {AccountId, AccountIndex, Address} from '@cennznet/types/polkadot';
 import {AnyNumber, CodecArg, IHash} from '@cennznet/types/polkadot.types';
+import AccountId from '@plugnet/types/primitive/AccountId';
 import BN from 'bn.js';
-import {Observable} from 'rxjs';
 import EnhancedAssetId from './registry/EnhancedAssetId';
 
-export type AnyAddress = BN | Address | AccountId | AccountIndex | Array<number> | Uint8Array | number | string;
+export type AnyAddress = AccountId | Uint8Array | Array<number> | string;
 
 export type AnyAssetId = AnyNumber | AssetId | EnhancedAssetId;
 
@@ -56,9 +55,4 @@ export interface QueryableGetBalance {
     (assetId: AnyNumber, address: AnyAddress): Promise<BN>;
     (assetId: AnyNumber, address: AnyAddress, cb: any): Promise<() => any>;
     at(hash: IHash, assetId: AnyNumber, address: AnyAddress): Promise<BN>;
-}
-
-export interface QueryableGetBalanceRx {
-    (assetId: AnyNumber, address: AnyAddress): Observable<BN>;
-    at(hash: IHash, assetId: AnyNumber, address: AnyAddress): Observable<BN>;
 }

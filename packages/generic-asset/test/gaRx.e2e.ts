@@ -18,7 +18,6 @@
 import {ApiRx} from '@cennznet/api';
 import {WsProvider, SubmittableResult} from '@cennznet/api/polkadot';
 import {Hash} from '@cennznet/types/polkadot';
-import {stringToU8a} from '@cennznet/util';
 import {SimpleKeyring, Wallet} from '@cennznet/wallet';
 import {take, filter, switchMap, first} from 'rxjs/operators';
 import {combineLatest} from 'rxjs';
@@ -30,13 +29,12 @@ const assetOwner = {
     uri: '//cennznet-js-test',
 };
 const receiver = {
-    address: '5EfqejHV2xUUTdmUVBH7PrQL3edtMm1NQVtvCgoYd8RumaP3'
+    address: '5ESNjjzmZnnCdrrpUo9TBKhDV1sakTjkspw2ZGg84LAK1e1Y'
 }
 const testAsset = {
     id: 16000,
     symbol: 'CENNZ-T',
-    ownerAccount: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT',
-    totalSupply: '10000000000000000000000000000'
+    ownerAccount: '5FPCjwLUkeg48EDYcW5i4b45HLzmCn4aUbx5rsCsdtPbTsKT'
 };
 
 const passphrase = 'passphrase';
@@ -59,11 +57,10 @@ describe('Generic asset Rx APIs', () => {
     });
 
     afterAll(async () => {
-        ((api as any)._rpc._provider as any).websocket.onclose = null;
-        ((api as any)._rpc._provider as any).websocket.close();
+        api.disconnect();
     });
 
-    describe.only('tests which work!', () => {
+    describe('tests which work!', () => {
         describe('create()', () => {
             it('should create asset and return \'Created\' event when finishing', (done) => {
                 const totalAmount = 100;
@@ -241,47 +238,25 @@ describe('Generic asset Rx APIs', () => {
         it('queries free balance with subscribe', async (done) => {
             const balance = await ga.getFreeBalance(testAsset.id, assetOwner.address).pipe(first()).toPromise();
             let counter1 = 1;
-            let counter2 = 1;
             const transferAmount = 7;
-            ga.getFreeBalance(testAsset.id, assetOwner.address).pipe(
-                take(3)
-            ).subscribe(async (balanceSubscribe) => {
+            ga.getFreeBalance(testAsset.id, assetOwner.address)
+              .subscribe(async (balanceSubscribe) => {
                 switch (counter1) {
                     case 1:
-                        expect(balance.toString()).toEqual(balanceSubscribe.toString());
-                        break;
-                    case 2:
-                        // should get return value when balance is changed
-                        expect((balance.subn(transferAmount)).toString()).toEqual(balanceSubscribe.toString());
-                        break;
+                      expect(balance.toString()).toEqual(balanceSubscribe.toString());
+                      break;
+                    case 3:
+                      // should get return value when balance is changed
+                      expect((balance.subn(transferAmount)).toString()).toEqual(balanceSubscribe.toString());
+                      done();
+                      break;
+                    default:
+                      break;
                 }
                 counter1 += 1;
             });
 
-            ga.getFreeBalance(testAsset.id, assetOwner.address).pipe(take(4)).subscribe(async (balanceSubscribe) => {
-                switch (counter2) {
-                    case 1:
-                        expect(balance.toString()).toEqual(balanceSubscribe.toString());
-                        // transfer to change balance value for triggering subscribe
-                        await ga.transfer(testAsset.id, receiver.address, transferAmount).signAndSend(assetOwner.address).pipe(first()).toPromise();
-                        break;
-                    case 2:
-                        // should get return value when balance is changed
-                        expect((balance.subn(transferAmount)).toString()).toEqual(balanceSubscribe.toString());
-                        // transfer to change balance value for triggering subscribe
-                        await ga.transfer(testAsset.id, receiver.address, transferAmount).signAndSend(assetOwner.address).pipe(first()).toPromise();
-                        break;
-                    case 3:
-                        expect((balance.subn(transferAmount * 2)).toString()).toEqual(balanceSubscribe.toString());
-                        await ga.transfer(testAsset.id, receiver.address, transferAmount).signAndSend(assetOwner.address).pipe(first()).toPromise();
-                        break;
-                    case 4:
-                        expect((balance.subn(transferAmount * 3)).toString()).toEqual(balanceSubscribe.toString());
-                        done();
-                        break;
-                }
-                counter2 += 1;
-            });
+            await ga.transfer(testAsset.id, receiver.address, transferAmount).signAndSend(assetOwner.address).pipe(first()).toPromise();
         })
     });
 
@@ -318,7 +293,7 @@ describe('Generic asset Rx APIs', () => {
     describe('queryTotalIssuance()', () => {
         it('returns total extrinsic', async () => {
             const balance = await ga.getTotalIssuance(testAsset.id).pipe(first()).toPromise();
-            expect(balance.toString()).toEqual(testAsset.totalSupply);
+            expect(balance.gtn(0)).toBeTruthy();
         })
     });
 
