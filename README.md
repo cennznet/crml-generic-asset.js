@@ -1,3 +1,7 @@
+# Merged into api.js repo
+[https://github.com/cennznet/api.js](https://github.com/cennznet/api.js/tree/master/packages/crml-generic-asset)
+
+----
 # `cennznet-js/crml-generic-asset`
 
 A sdk providing additional features for generic asset runtime module
